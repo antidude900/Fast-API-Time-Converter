@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+*.swp
+*~
+.DS_Store
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Packages
+# mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+
+# Docker
+.dockerenv
