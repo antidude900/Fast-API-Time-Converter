@@ -1,17 +1,17 @@
-name: CI/CD
+name: CI Workflow
 
 on:
   push:
-    branches: ["main"]
+    branches: ["**"]
   pull_request:
-    branches: ["main"]
+    branches: ["**"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -23,17 +23,18 @@ jobs:
       - name: Install dependencies
         run: |
           python -m venv venv
-          source venv/bin/activate
+          source venv/bin/activate  
           pip install -U pip
           pip install -r requirements.txt
-          pip install pre-commit
 
       - name: Run pre-commit checks
-        run: pre-commit run --all-files
+        run: |
+          source venv/bin/activate  
+          pre-commit run --all-files
 
       - name: Run Pytest
         run: |
-          source venv/bin/activate
+          source venv/bin/activate  
           pytest
 
       - name: Build Docker image
