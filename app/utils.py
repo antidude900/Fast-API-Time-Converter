@@ -5,6 +5,7 @@ import pytz
 
 
 COUNTRIES = {
+    # Mapping of common country names to their names identifiable by pycountry
     "Bolivia": "Bolivia, Plurinational State of",
     "Iran": "Iran, Islamic Republic of",
     "Laos": "Lao People's Democratic Republic",
@@ -22,6 +23,9 @@ COUNTRIES = {
 
 
 def resolve_timezone(tz_or_country: str) -> str:
+    """
+    Coverts a country name to timezone for the pytz library
+    """
     try:
         pytz.timezone(tz_or_country)
         return tz_or_country
@@ -53,14 +57,17 @@ def resolve_timezone(tz_or_country: str) -> str:
 
 
 def convert_timezone(input_time: time, from_tz: str, to_tz: str) -> datetime:
+    """
+    Converts a time from one timezone to another using pytz library.
+    """
     from_zone_name = resolve_timezone(from_tz)
     to_zone_name = resolve_timezone(to_tz)
 
     from_zone = pytz.timezone(from_zone_name)
     to_zone = pytz.timezone(to_zone_name)
 
-    naive_datetime = datetime.combine(datetime.today(), input_time)
-    localized_datetime = from_zone.localize(naive_datetime)
+    simple_datetime = datetime.combine(datetime.today(), input_time)
+    localized_datetime = from_zone.localize(simple_datetime)
     converted_datetime = localized_datetime.astimezone(to_zone)
 
     return converted_datetime

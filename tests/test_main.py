@@ -5,12 +5,18 @@ client = TestClient(app)
 
 
 def test_read_root():
+    """
+    Test the root endpoint to check if the API is running
+    """
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "Hello from the Timezone Converter!"}
 
 
 def test_convert_time_valid_conversion():
+    """
+    Test the convert_time endpoint with valid time and timezone
+    """
     response = client.get(
         "/convert_time",
         params={
@@ -26,6 +32,9 @@ def test_convert_time_valid_conversion():
 
 
 def test_convert_time_utc_conversion():
+    """
+    Test the convert_time endpoint with UTC conversion
+    """
     response = client.get(
         "/convert_time",
         params={
@@ -41,6 +50,9 @@ def test_convert_time_utc_conversion():
 
 
 def test_convert_time_invalid_timezone():
+    """
+    Test the convert_time endpoint with invalid timezone
+    """
     response = client.get(
         "/convert_time",
         params={
@@ -54,6 +66,9 @@ def test_convert_time_invalid_timezone():
 
 
 def test_convert_time_invalid_time_format():
+    """
+    Test the convert_time endpoint with invalid time format
+    """
     response = client.get(
         "/convert_time",
         params={
@@ -66,7 +81,42 @@ def test_convert_time_invalid_time_format():
     assert "Invalid time format" in response.json()["detail"]
 
 
+def test_convert_time_with_common_country_name():
+    """
+    Test the convert_time endpoint with country name not recognized by pycountry instead of timezone
+    """
+    response = client.get(
+        "/convert_time",
+        params={"time": "15:00", "from_tz": "Russia", "to_tz": "United States"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "Europe/Kaliningrad" in data["original_time"]
+    assert "America/New_York" in data["converted_time"]
+
+
+def test_convert_time_with_country_name():
+    """
+    Test the convert_time endpoint with country name recognized by pycountry instead of timezone
+    """
+    response = client.get(
+        "/convert_time",
+        params={
+            "time": "09:00",
+            "from_tz": "Nepal",
+            "to_tz": "America/Los_Angeles",
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "Asia/Kathmandu" in data["original_time"]
+    assert " America/Los_Angeles" in data["converted_time"]
+
+
 def test_all_timezones():
+    """
+    Test the all_timezones endpoint to get a list of all timezones
+    """
     response = client.get("/all_timezones")
     assert response.status_code == 200
     data = response.json()
@@ -74,29 +124,19 @@ def test_all_timezones():
     assert len(data["timezones"]) > 0
 
 
-def test_get_timezone_valid_country_name():
-    response = client.get("/timezones/United States")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["country"] == "United States"
-    assert len(data["timezone"]) > 0
-
-
-def test_get_timezone_valid_country_code():
-    response = client.get("/timezones/United States")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["country"] == "United States"
-    assert len(data["timezone"]) > 0
-
-
 def test_get_timezone_invalid_country_name():
+    """ "
+    Test the get_timezone endpoint with an invalid country name
+    """
     response = client.get("/timezones/InvalidCountry")
     assert response.status_code == 400
     assert "Invalid country name" in response.json()["detail"]
 
 
-def test_get_timezone():
+def test_get_timezone_with_common_country_name():
+    """
+    Test the get_timezone endpoint with a country name not recognized by pycountry
+    """
     response = client.get("/timezones/Russia")
     assert response.status_code == 200
     data = response.json()
@@ -104,27 +144,12 @@ def test_get_timezone():
     assert len(data["timezone"]) > 0
 
 
-def test_convert_time_with_country_name():
-    response = client.get(
-        "/convert_time",
-        params={"time": "15:00", "from_tz": "Nepal", "to_tz": "United States"},
-    )
+def test_get_timezone_with_country_name():
+    """
+    Test the get_timezone endpoint with a countr name recognized by pycountry
+    """
+    response = client.get("/timezones/United States")
     assert response.status_code == 200
     data = response.json()
-    assert "Asia/Kathmandu" in data["original_time"]
-    assert "America/New_York" in data["converted_time"]
-
-
-def test_convert_time_with_official_country_name():
-    response = client.get(
-        "/convert_time",
-        params={
-            "time": "09:00",
-            "from_tz": "Korea, Republic of",
-            "to_tz": "America/Los_Angeles",
-        },
-    )
-    assert response.status_code == 200
-    data = response.json()
-    assert "Asia/Seoul (Korea, Republic of)" in data["original_time"]
-    assert " America/Los_Angeles" in data["converted_time"]
+    assert data["country"] == "United States"
+    assert len(data["timezone"]) > 0

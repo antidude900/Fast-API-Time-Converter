@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Query, HTTPException
 from datetime import datetime
-import pycountry
-import pytz
+import pycountry  # to get the timezone of a country if country name is provided
+import pytz  # to convert time from one timezone to another
 from app.utils import COUNTRIES, resolve_timezone, convert_timezone
 
 app = FastAPI()
@@ -9,6 +9,9 @@ app = FastAPI()
 
 @app.get("/")
 async def read_root():
+    """
+    Root endpoint to check if the API is running
+    """
     return {"message": "Hello from the Timezone Converter!"}
 
 
@@ -18,6 +21,18 @@ async def convert_time(
     from_tz: str = Query(..., description="Source timezone (e.g: 'Asia/Kathmandu')"),
     to_tz: str = Query(..., description="Destination timezone (e.g: 'Asia/Delhi')"),
 ):
+    """
+    Endpoint to convert time from one timezone to another.
+
+    Parameters:
+    - time: Time in HH:MM format
+    - from_tz: Source timezone (Can be a timezone or a country name)
+    - to_tz: Destination timezone (Can be a timezone or a country name)
+
+    Returns:
+    - original_time: The original time with the source timezone and country name(if from_tz is a timezone)
+    - converted_time: The converted time with the destination timezone and country name(if to_tz is a timezone)
+    """
     try:
         dt_object = datetime.strptime(time, "%H:%M")
         time_obj = dt_object.time()
@@ -39,11 +54,24 @@ async def convert_time(
 
 @app.get("/all_timezones")
 async def get_timezones():
+    """
+    Endpoint to get list of all timezones.
+    """
     return {"timezones": pytz.all_timezones}
 
 
 @app.get("/timezones/{country_name}")
 def get_timezone(country_name: str):
+    """
+    Endpoint to get timezones for a given country name.
+
+    Parameters:
+    - country_name: Name of the country
+
+    Returns:
+    - country: Name of the country
+    - timezone: List of timezones for the country
+    """
     try:
         country = pycountry.countries.get(name=country_name)
         if not country:
