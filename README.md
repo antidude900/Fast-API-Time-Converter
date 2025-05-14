@@ -8,7 +8,7 @@ A FastAPI application that allows you to convert time between different timezone
 
 - Convert time between timezones
 - List all available timezones
-- Get timezones for a specific country (with support for ambiguous names)
+- Get timezones for a specific country
 
 ---
 
