@@ -1,0 +1,7 @@
+{
+	"venvPath": ".",
+	"venv": "venv",
+	"include": ["app", "tests"],
+	"reportMissingImports": true,
+	"reportMissingModuleSource": true
+}
